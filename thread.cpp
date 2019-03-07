@@ -9,44 +9,40 @@
 
 #define EOS -1
 
-using namespace std;
-
-
 class SafeQueue{
-    private:
-        std::queue<int> queue;
-        std::mutex d_mutex;
-        std::condition_variable d_condition;
+private:
+    std::queue<int> queue;
+    std::mutex d_mutex;
+    std::condition_variable d_condition;
 
-    public:
+public:
 
-        void safePush(int v){
-            std::unique_lock<std::mutex> lock(d_mutex);
-            this->queue.push(v);
-            this->d_condition.notify_one();
-        }
+    void safePush(int v){
+        std::unique_lock<std::mutex> lock(d_mutex);
+        this->queue.push(v);
+        this->d_condition.notify_one();
+    }
 
-        int safePop(){
-            std::unique_lock<std::mutex> lock(d_mutex);
-            this->d_condition.wait(lock, [=]{ return !this->queue.empty(); });            
-            int popped = this->queue.front();
-            this->queue.pop();
-            return popped;
-        }
+    int safePop(){
+        std::unique_lock<std::mutex> lock(d_mutex);
+        this->d_condition.wait(lock, [=]{ return !this->queue.empty(); });
+        int popped = this->queue.front();
+        this->queue.pop();
+        return popped;
+    }
 
-        bool safeEmpty(){
-            std::unique_lock<std::mutex> lock(d_mutex);
-            this->d_condition.wait(lock, [=]{ return !this->queue.empty(); });            
-            return this->queue.empty();
-        }
+    bool safeEmpty(){
+        std::unique_lock<std::mutex> lock(d_mutex);
+        this->d_condition.wait(lock, [=]{ return !this->queue.empty(); });
+        return this->queue.empty();
+    }
 
-        int safeFront(){
-           std::unique_lock<std::mutex> lock(d_mutex);
-            this->d_condition.wait(lock, [=]{ return !this->queue.empty(); });            
-           return this->queue.front();
-        }   
+    int safeFront(){
+        std::unique_lock<std::mutex> lock(d_mutex);
+        this->d_condition.wait(lock, [=]{ return !this->queue.empty(); });
+        return this->queue.front();
+    }
 };
-
 
 std::vector<SafeQueue*> safeQueues;
 
@@ -64,7 +60,7 @@ void streamIncrease(){
         safeQueues.at(1)->safePush(++v);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-    safeQueues.at(1)->safePush(EOS);       
+    safeQueues.at(1)->safePush(EOS);
 }
 
 void streamSquare(){
@@ -92,38 +88,71 @@ void printAll(){
     std::cout << std::endl;
 }
 
-int main(int argc, char* argv[]){
-    int m = atoi(argv[1]);
-    
+typedef void (*FunctionWithoutParam) ();
 
+int main(int argc, const char** argv) {
+    constexpr unsigned num_threads = 5;
+    //const int m = 5;
+    int m = atoi(argv[1]);
+    std::vector<std::function<void()> > funcs;
+
+    funcs.push_back(streamIncrease);
+    funcs.push_back(streamSquare);
+    funcs.push_back(streamDecrease);
+    funcs.push_back(streamDecrease);
+
+    FunctionWithoutParam functions[] =
+            {
+                    streamIncrease,
+                    streamSquare,
+                    streamDecrease,
+                    printAll
+            };
+    // A mutex ensures orderly access to std::cout from multiple threads.
+    std::mutex iomutex;
+    std::vector<std::thread> threads(num_threads);
     safeQueues.resize(0);
     for(int i = 0; i < 4; i++)
         safeQueues.push_back(new SafeQueue());
 
-    std::vector<std::thread*> threads;
-    threads.resize(0);
-    threads.push_back(new thread(streamInt, m));
-    threads.push_back(new thread(streamIncrease));
-    threads.push_back(new thread(streamSquare));
-    threads.push_back(new thread(streamDecrease));
-    threads.push_back(new thread(printAll));
 
-    //for(int i = 0; i < 5; i++)
-    //    threads.at(i)->sleep_for(std::chrono::milliseconds(1000));
 
-    for(int i = 0; i < 5; i++){
+    for (unsigned i = 0; i < num_threads; ++i) {
+        threads[i] = std::thread([&iomutex, i, &m, &functions] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            while (1) {
+                {
+                    // Use a lexical scope and lock_guard to safely lock the mutex only
+                    // for the duration of std::cout usage.
+                    std::lock_guard<std::mutex> iolock(iomutex);
+                    std::cout << "Thread #" << i << ": on CPU " << sched_getcpu() << "\n";
+                }
+                if( i == 0){
+                    streamInt(m);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
+                else{
+                    functions[i - 1]();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(900));
+            }
+        });
+
+        // Create a cpu_set_t object representing a set of CPUs. Clear it and mark
+        // only CPU i as set.
         cpu_set_t cpuset;
         CPU_ZERO(&cpuset);
         CPU_SET(i, &cpuset);
-        pthread_setaffinity_np(threads.at(i)->native_handle(), sizeof(cpu_set_t), &cpuset);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "Thread #" << i << ": on CPU " << sched_getcpu() << "\n";
+        int rc = pthread_setaffinity_np(threads[i].native_handle(),
+                                        sizeof(cpu_set_t), &cpuset);
+        if (rc != 0) {
+            std::cerr << "Error calling pthread_setaffinity_np: " << rc << "\n";
+        }
     }
 
-    for(int i = 0; i < 5; i++)
-        threads.at(i)->join();
-
+    for (auto& t : threads) {
+        t.join();
+    }
     return 0;
 }
-
-//EOF e dies on read
