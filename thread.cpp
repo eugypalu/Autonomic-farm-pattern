@@ -5,6 +5,7 @@
 #include<mutex>
 #include<condition_variable>
 #include<vector>
+#include<chrono>
 #include<unistd.h>
 
 #define EOS -1
@@ -91,15 +92,10 @@ void printAll(){
 typedef void (*FunctionWithoutParam) ();
 
 int main(int argc, const char** argv) {
+    //auto start = chrono::steady_clock::now();
     constexpr unsigned num_threads = 5;
-    //const int m = 5;
     int m = atoi(argv[1]);
-    std::vector<std::function<void()> > funcs;
-
-    funcs.push_back(streamIncrease);
-    funcs.push_back(streamSquare);
-    funcs.push_back(streamDecrease);
-    funcs.push_back(streamDecrease);
+    int cond = atoi(argv[2]);
 
     FunctionWithoutParam functions[] =
             {
@@ -116,11 +112,12 @@ int main(int argc, const char** argv) {
         safeQueues.push_back(new SafeQueue());
 
 
-
-    for (unsigned i = 0; i < num_threads; ++i) {
-        threads[i] = std::thread([&iomutex, i, &m, &functions] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
-            while (1) {
+    if (cond == 1) {
+        std::cout << "Sticky";
+        for (unsigned i = 0; i < num_threads; ++i) {
+            threads[i] = std::thread([&iomutex, i, &m, &functions] {
+                //std::this_thread::sleep_for(std::chrono::milliseconds(20)); //sleep non necessario
+                //while (1) {
                 {
                     // Use a lexical scope and lock_guard to safely lock the mutex only
                     // for the duration of std::cout usage.
@@ -129,30 +126,59 @@ int main(int argc, const char** argv) {
                 }
                 if( i == 0){
                     streamInt(m);
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //da togliere
                 }
                 else{
                     functions[i - 1]();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //da togliere
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(900));
-            }
-        });
+                //}
+            });
 
-        // Create a cpu_set_t object representing a set of CPUs. Clear it and mark
-        // only CPU i as set.
-        cpu_set_t cpuset;
-        CPU_ZERO(&cpuset);
-        CPU_SET(i, &cpuset);
-        int rc = pthread_setaffinity_np(threads[i].native_handle(),
-                                        sizeof(cpu_set_t), &cpuset);
-        if (rc != 0) {
-            std::cerr << "Error calling pthread_setaffinity_np: " << rc << "\n";
+            // Create a cpu_set_t object representing a set of CPUs. Clear it and mark
+            // only CPU i as set.
+            cpu_set_t cpuset;
+            CPU_ZERO(&cpuset);
+            CPU_SET(i, &cpuset);
+            int rc = pthread_setaffinity_np(threads[i].native_handle(),
+                                            sizeof(cpu_set_t), &cpuset);
+            if (rc != 0) {
+                std::cerr << "Error calling pthread_setaffinity_np: " << rc << "\n";
+            }
+        }
+    }else{
+        std::cout << "Normale" << "\n";
+        for (unsigned i = 0; i < num_threads; ++i) {
+            threads[i] = std::thread([i, &m, &functions] {
+
+                std::cout << "Thread #" << i << ": on CPU " << sched_getcpu() << "\n";
+
+                if( i == 0){
+                    streamInt(m);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //da togliere
+                }
+                else{
+                    functions[i - 1]();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //da togliere
+                }
+                std::cout << "Thread #" << i << ": on CPU " << sched_getcpu() << "\n";
+
+            });
         }
     }
+
+
 
     for (auto& t : threads) {
         t.join();
     }
+
+    /*auto end = chrono::steady_clock::now();
+
+       cout << "Elapsed time in milliseconds : "
+    << chrono::duration_cast<chrono::milliseconds>(end - start).count()
+    << " ms" << endl;*/
+
+
     return 0;
 }
