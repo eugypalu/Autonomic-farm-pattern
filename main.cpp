@@ -36,13 +36,12 @@ public:
         int workerRequest;
 
         while((void*)inputSequence->safe_pop(&next) != EOS){
-            std::cout<<(*((int*) next))<<std::endl;
-            std::cout<<(*((int*) next))<<std::endl;
             std::cout<<"emitter"<<std::endl;
+            std::cout<<(*((int*) next))<<std::endl;
             //vectorWorkerIdRequest[3] = 2;
             //Invece che utilizzare una safequeue ho utilizzato un vettore. Il while scorre finchè non trova un valore diverso da 0
             //vectorWorkerIdRequest->at(1) = 2;
-            while(vectorWorkerIdRequest->at(counter) == 0){
+            while(*vectorWorkerIdRequest->at(counter) == -2){
                 if(counter == ((int)*maxWorker) - 1) counter = 0;
                 counter += 1;
                 //std::cout<<"qui si"<<std::endl;//dovrà stampare "Nessuna richiesta dal worker"
@@ -50,6 +49,11 @@ public:
             workerRequest = *vectorWorkerIdRequest->at(counter);//TODO a me NON sembra che qui sia necessario usare i puntatori
             std::cout<<"qui non dovrei arrivarci mai"<<std::endl;
             this->jobsRequest->at(workerRequest)->safe_push(next); //assegno al worker//TODO decommentare
+            std::cout<<"eseguito il push di: ";
+            std::cout<<*(int*)next;
+            std::cout<<" alla lista ";
+            std::cout<<workerRequest<<std::endl;
+
         }
         for(int i = 0; i < jobsRequest->size(); i++) {
             this->jobsRequest->at(i)->safe_push(EOS);
@@ -68,7 +72,7 @@ public:
 
 class Worker{
 private:
-    void* workerId; //assegnato dal controller
+    int* workerId; //assegnato dal controller
     Safe_Queue* outputQueue;
     Safe_Queue* jobsRequest;//viene creata dal controller
     std::thread* thWorker;
@@ -86,42 +90,80 @@ private:
 
 public:
 
-    Worker(int* _workerId, Safe_Queue* _jobsRequest, std::vector<int*>* _vectorWorkerIdRequest){
-        workerId = _workerId;
+    Worker(int _workerId, Safe_Queue* _jobsRequest, std::vector<int*>* _vectorWorkerIdRequest, Safe_Queue* _outputQueue){
+        workerId = new int(_workerId);
         jobsRequest = _jobsRequest;
         vectorWorkerIdRequest = _vectorWorkerIdRequest;
-        std::cout<<"worker"<<std::endl;
+        outputQueue = _outputQueue;
     }
 
     void main(){
-        std::cout<<"Nel main ci entri?"<<std::endl;
         while(true){
-            std::cout<<"MAIN DEL worker"<<std::endl;
-            vectorWorkerIdRequest->at(*(int*)workerId) = (int*)workerId;
+            vectorWorkerIdRequest->at((*workerId)) = ((int*)workerId);
             //inputWorkerQueue->safe_push(&workerId);
             void* val = 0;
             jobsRequest->safe_pop(&val);
+            std::cout<<"Il valore assegnato è: ";
+            std::cout<<*(int*)val<<std::endl;
             //se val è EOS Stampo nell'output stream eos ed esco dal while
-            if(val == EOS){
+            if(*(int*)val == -1){
+                std::cout<<"il valore è EOS!!!!!!"<<std::endl;
                 outputQueue->safe_push(EOS);
                 break;
             }
-            auto res = testOdd(&val);//qui devo chiamare una void non deve restituirmi valore
+            void* res = testOdd(&val);//qui devo chiamare una void non deve restituirmi valore
             outputQueue->safe_push(res);
         }
     }
 
     void startWorker() {
-        std::cout<<"startworker??"<<std::endl;
+        std::cout<<"Worker ";
+        std::cout<<*workerId;
+        std::cout<<" Runnato"<<std::endl;
         this->thWorker = new std::thread(&Worker::main, this);
         this->joinWorker();
     }
 
     void joinWorker(){
         thWorker->join();
+        this->joinWorker();
     }
 };
 
+class Collector{
+private:
+    std::thread* thCollector;
+    Safe_Queue* outputQueue;
+    int* EOSCounter = new int(0);
+    int* actualWorker;//TODO dovrà esserci una lock qui dato che il numero potrà cambiare
+public:
+    Collector(Safe_Queue* _outputQueue, int* _actualWorker){
+        outputQueue = _outputQueue;
+        actualWorker = _actualWorker;
+    }
+
+    void main(){
+        while (true){
+            if(EOSCounter <= actualWorker){
+                void* output;
+                outputQueue->safe_pop(&output);
+                if(output == EOS){
+                    EOSCounter += 1;
+                }
+                std::cout<<"L'output è: ";
+                std::cout<<*(int*)output<<std::endl;
+            }
+        }
+    }
+
+    void startCollector() {
+        this->thCollector = new std::thread(&Collector::main, this);
+    }
+
+    void joinCollector(){
+        thCollector->join();
+    }
+};
 
 class Controller{
 private:
@@ -129,6 +171,7 @@ private:
     int* maxWorker;
     int* initWorker;
     Safe_Queue* initSequence; //sequenza di void mandata dall'utente
+    Safe_Queue* outputSequence;//TODO per ora è una safequeue, poi diventerà un vettore con le lock per ridurre overhead
     std::vector<Safe_Queue*>* jobsRequest = new std::vector<Safe_Queue*>();
     std::vector<Worker*>* workerVector = new std::vector<Worker*>();
     std::vector<int*>* vectorWorkerIdRequest = new std::vector<int*>();
@@ -139,53 +182,31 @@ public:
         initSequence = _queue;
 
         this->jobsRequest->resize(*maxWorker);
-        this->vectorWorkerIdRequest->resize(*_maxWorker);
+        this->vectorWorkerIdRequest->resize(*_maxWorker, new int(-2));
         this->workerVector->resize(*_maxWorker);
-        std::cout<<_maxWorker<<std::endl;
-        std::cout<<*_maxWorker<<std::endl;
+        this->outputSequence = new Safe_Queue(_queue->safe_get_size());
         for (int i = 0; i < *_maxWorker; ++i) {
             Safe_Queue* q = new Safe_Queue(1);
             jobsRequest->at(i) = q;
-            std::cout<<"safequeue creata all'indirizzo"<< std::endl;
+            std::cout<<"safequeue creata all'indirizzo ";
             std::cout<< jobsRequest->at(i) << std::endl;
         }
     }
 
     void start(){
+        int workerId = 0;
         Emitter emitter(maxWorker, initSequence, jobsRequest, vectorWorkerIdRequest);
         //std::vector<Worker> workerVector[*numWorker];
-        for (int* i = new int(0); *i < *maxWorker; *i+=1) {
-            std::cout<<"dehdeh"<<std::endl;
-            std::cout<<jobsRequest<<std::endl;
-            Worker* worker = new Worker(i, jobsRequest->at(*i), vectorWorkerIdRequest);
-            std::cout<<"qui?"<<std::endl;
-            std::cout<<"Voglio indirizzi della classe"<<std::endl;
-            std::cout<<"Voglio indirizzi della classe"<<std::endl;
-            std::cout<<"Voglio indirizzi della classe"<<std::endl;
-            std::cout<<"Voglio indirizzi della classe"<<std::endl;
-            std::cout<<"Voglio indirizzi della classe"<<std::endl;
-            std::cout<<worker<<std::endl;
-            this->workerVector->push_back(worker);
-            std::cout<<"controcheck"<<std::endl;
-            std::cout<<"controcheck"<<std::endl;
-            std::cout<<"controcheck"<<std::endl;
-            std::cout<<"controcheck"<<std::endl;
-            std::cout<<workerVector->at(*i)<<std::endl;
-            std::cout<<workerVector->size()<<std::endl;
-            std::cout<<"deh"<<std::endl;
-            //this->workerVector.at(*i) = worker;
-            //this->workerVector.at(*i).startWorker();
-        }
-
-        for (int j = 0; j < workerVector->size(); ++j) {
-            std::cout<<workerVector->at(j)<<std::endl;
+        for (int i = 0; i < *maxWorker; i+=1) {
+            //int* workerId = new int(0);
+            Worker* worker = new Worker(workerId, jobsRequest->at(workerId), vectorWorkerIdRequest, outputSequence);
+            this->workerVector->at(workerId) = (worker);
+            workerId += 1;
         }
 
         emitter.startEmitter();
         for (int i = 0; i < *maxWorker; ++i) {
-            //std::cout<<"Questo è il for dei worker"<<std::endl;
-            //workerVector->at(i)->startWorker();
-            //std::cout<< workerVector->at(i)<<std::endl;
+            workerVector->at(i)->startWorker();
         }
     }
 
@@ -203,11 +224,17 @@ int main() {
     int* maxWorker= new int(2);
     int* initWorker= new int(2);
     Safe_Queue* testSequence;
-    testSequence = new Safe_Queue(10);
+    testSequence = new Safe_Queue(10 + *maxWorker);
     for(int i = 0; i < 10; i++){
         int* val = new int(rand() % 100 + 1);
         testSequence->safe_push(val);
     }
+
+    int* eos = new int(-1);
+    for (int j = 0; j < *maxWorker; ++j) {
+        testSequence->safe_push(eos);
+    }
+
     Controller ctrl(maxWorker, initWorker, testSequence);
     ctrl.start();
     /*for(int i = 0; i < 10; i++){
