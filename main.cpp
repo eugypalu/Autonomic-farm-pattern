@@ -72,7 +72,7 @@ private:
     Safe_Queue* serviceTime;
     std::thread* thWorker;
     std::vector<int*>* vectorWorkerIdRequest;
-    bool active_worker;
+    int active_worker;
     std::mutex* status_mutex;
     std::condition_variable* status_condition;
 
@@ -97,13 +97,16 @@ public:
         serviceTime = _serviceTime;
         status_mutex = new std::mutex();
         status_condition = new std::condition_variable();
-        active_worker = false; //di default il worker non è attivo, viene attivato quando viene chiamata la funzione startworker
+        active_worker = 0; //di default il worker non è attivo, viene attivato quando viene chiamata la funzione startworker
 
     }
 
     void main(){
-        this->activate();
-        while(checkWorkerStatus()){
+        //this->activate();
+        while(checkWorkerStatus() != 0){
+            if(checkWorkerStatus() == 2){
+                break;
+            }
             vectorWorkerIdRequest->at((*workerId)) = ((int*)workerId);
             std::cout<<"push da parte del worker "<<*workerId<<" eseguito"<<std::endl;
             //inputWorkerQueue->safe_push(&workerId);
@@ -127,26 +130,39 @@ public:
             std::cout<<"il service time è: "<< act_service_time.count()<<std::endl;
             //double* st = new double(act_service_time.count());//TODO orribile
             //size_t st = (size_t)(act_service_time * 1000);
-            size_t* st = new size_t(act_service_time.count() * 1000);
+            size_t* st = new size_t(act_service_time.count() * 1000);//TODO cotinua ad essere orribile anche così
             serviceTime->safe_push(st);
             outputQueue->safe_push(res);
         }
     }
 
     void activate(){
+        //0:non_attivo
+        //1: attivo
+        //2: termina
         std::cout<<"worker "<<*workerId<<" attivato"<<std::endl;
         std::unique_lock<std::mutex> lock(*status_mutex);
-        active_worker = true;
+        active_worker = 1;
         status_condition->notify_one();
     }
 
     void disactivate(){
         std::unique_lock<std::mutex> lock(*status_mutex);
-        active_worker = false;
+        active_worker = 0;
+        status_condition->notify_one();
     }
 
-    bool checkWorkerStatus(){
+    void disactivateAndTerminate(){
         std::unique_lock<std::mutex> lock(*status_mutex);
+        active_worker = 2;
+        status_condition->notify_one();
+    }
+
+    int checkWorkerStatus(){
+        std::unique_lock<std::mutex> lock(*status_mutex);
+        if(active_worker == 0){
+            status_condition->wait(lock);
+        }
         return active_worker;
     }
 
@@ -255,15 +271,18 @@ public:
         }
 
         emitter.startEmitter();
-        for (int i = 0; i < *initWorker; ++i) {
+        for (int i = 0; i < *maxWorker; ++i) {
             workerVector->at(i)->startWorker();
+        }
+        for (int i = 0; i < *initWorker; ++i) {
+            workerVector->at(i)->activate();
         }
 
         void* actualTime = 0;
         int averageCounter = 0;
         serviceTime->safe_pop(&actualTime);
         while (*EOSCounter < (*actualWorker)-1){
-            std::cout<<*(int*)actualTime<<std::endl;
+            //std::cout<<*(int*)actualTime<<std::endl;
             if(*(int*)actualTime == -1){
                 EOSCounter +=1;
             }else{
@@ -279,20 +298,39 @@ public:
             }
         }
 
-        for (int i = 0; i < *actualWorker; ++i) {
+        for (int j = *actualWorker; j < *maxWorker; ++j) {
+            std::cout<<"disattivo il worker "<<j<<std::endl;
+            workerVector->at(j)->disactivateAndTerminate();
+        }
+
+        for (int i = 0; i < *maxWorker; ++i) {
             std::cout<<"STO FACENDO IL JOIN DEI WORKER"<<std::endl;
             workerVector->at(i)->joinWorker();
         }
         emitter.joinEmitter();
     }
 
-    void checkTime(){ //TODO qui va aggiunta tutta la roba per l'attivazione dei thread
+    void checkTime(){
         if(*averageTime >= *expectedServiceTime && *averageTime <= *upperBoundServiceTime){
-            std::cout<<"qui tutto bene, non devono partire altri thread"<<std::endl;
+            //std::cout<<"qui tutto bene, non devono partire altri thread"<<std::endl;
+            std::cout<<"Expected service time "<<*expectedServiceTime<<" tempo medio "<<*averageTime<<" qui tutto bene, non devono partire altri thread"<<std::endl;
         }else if(*averageTime < *expectedServiceTime){
-            std::cout<<"qui va attivato un nuovo thread"<<std::endl;
-        }else{
-            std::cout<<"qui va disattivato un thread"<<std::endl;
+            std::cout<<"Expected service time "<<*expectedServiceTime<<" tempo medio "<<*averageTime<<" qui va disattivato un nuovo thread"<<std::endl;
+            std::cout<<"sto disattivando il thread "<<*actualWorker<<std::endl;
+            workerVector->at(*actualWorker)->disactivate();
+            if(*actualWorker > 0){
+                *actualWorker -= 1;
+                std::cout<<"actual worker "<<*actualWorker<<std::endl;
+            }
+        }else if(*averageTime > *upperBoundServiceTime){
+            //std::cout<<"qui va disattivato un thread"<<std::endl;
+            std::cout<<"Expected service time "<<*expectedServiceTime<<" tempo medio "<<*averageTime<<" qui va attivato un thread"<<std::endl;
+            std::cout<<"sto attivando il thread "<<*actualWorker<<std::endl;
+            if(*actualWorker < *maxWorker){
+                workerVector->at(*actualWorker)->activate();
+                *actualWorker += 1;
+            }
+
         }
 
     }
@@ -310,8 +348,9 @@ int main() {
     int* maxWorker= new int(5);
     int* initWorker= new int(3);
     int* movingAverageParam = new int(3);
-    size_t* expectedServiceTime = new size_t(0.1 * 1000);
-    size_t* upperBoundServiceTime = new size_t(0.2*1000);
+    size_t* expectedServiceTime = new size_t(1 * 1000);
+    size_t* upperBoundServiceTime = new size_t(3*1000);
+    //std::cout<<*expectedServiceTime<<"  "<<*upperBoundServiceTime<<"  "<<std::endl;
     Safe_Queue* testSequence;
     testSequence = new Safe_Queue(10 + *maxWorker);
     for(int i = 0; i < 10; i++){

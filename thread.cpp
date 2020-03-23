@@ -18,7 +18,7 @@ private:
 
 public:
 
-    void safePush(int v){
+    double safePush(int v){
         std::unique_lock<std::mutex> lock(d_mutex);
         this->queue.push(v);
         this->d_condition.notify_one();
