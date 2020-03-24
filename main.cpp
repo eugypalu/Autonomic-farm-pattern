@@ -3,7 +3,7 @@
 #include <vector>
 #include <queue>
 #include "./buffers/safe_queue.h"
-//#include "./buffersDouble/safe_double_queue.h"
+#include <math.h>
 
 #define EOS ((void*)-1)
 
@@ -22,7 +22,6 @@ public:
         inputSequence = _inputSequence;
         jobsRequest = _jobsRequest;
         vectorWorkerIdRequest = _vectorWorkerIdRequest;
-        //std::vector<int> vectorWorkerIdRequest((int)*maxWorker, 0); //ho messo 0 e non EOS per differenziarlo dal caso finale in cui viene inserito EOS e termina tutto??//TODO pensare a questa cosa
     }
 
     void nextItem(){
@@ -32,7 +31,7 @@ public:
         inputSequence->safe_pop(&next);
         while(*(int*)next != *eos){
 
-            //Invece che utilizzare una safequeue ho utilizzato un vettore. Il while scorre finchè non trova un valore diverso da 0
+            //Invece che utilizzare una safequeue ho utilizzato un vettore. Il while scorre finchè non trova un valore diverso da -2
             while(*vectorWorkerIdRequest->at(counter) == -2){
                 if(counter == ((int)*maxWorker)-1){
                     counter = 0;
@@ -68,11 +67,11 @@ private:
     int* workerId; //assegnato dal controller
     Safe_Queue* outputQueue;
     Safe_Queue* jobsRequest;//viene creata dal controller
-    //Safe_Double_Queue* serviceTime;
     Safe_Queue* serviceTime;
     std::thread* thWorker;
     std::vector<int*>* vectorWorkerIdRequest;
     int active_worker;
+    int* eos = new int(-1);
     std::mutex* status_mutex;
     std::condition_variable* status_condition;
 
@@ -85,6 +84,20 @@ private:
             std::cout << "odd" << std::endl;
             return 0;
         }
+    }
+
+    long isPrime(size_t x){
+        if(x==2)
+            return 1;
+        if(x%2==0)
+            return 0;
+        size_t i = 2, sq = sqrt(x);
+        while(i <= sq){
+            if(x % i == 0)
+                return 0;
+            i++;
+        }
+        return 1;
     }
 
 public:
@@ -102,29 +115,30 @@ public:
     }
 
     void main(){
-        //this->activate();
         while(checkWorkerStatus() != 0){
             if(checkWorkerStatus() == 2){
                 break;
             }
             vectorWorkerIdRequest->at((*workerId)) = ((int*)workerId);
             std::cout<<"push da parte del worker "<<*workerId<<" eseguito"<<std::endl;
-            //inputWorkerQueue->safe_push(&workerId);
             void* val = 0;
             jobsRequest->safe_pop(&val);
             auto start_time = std::chrono::high_resolution_clock::now();
             std::cout<<"Il valore assegnato è: "+std::to_string(*(int*)val)<<std::endl;
             if(*(int*)val == -1){
                 std::cout<<"il valore è EOS!!!!!!"<<std::endl;//se val è EOS Stampo nell'output stream eos ed esco dal while
-                outputQueue->safe_push(EOS);
-                int* eos = new int(-1);//TODO orribile, ma non va con EOS, da vedere
+                outputQueue->safe_push(eos);
+                long* eos = new long(-1);//TODO orribile, ma non va con EOS, da vedere
                 serviceTime->safe_push(eos);
                 disactivate();
                 break;
             }
             std::cout<<"questo calcolo viene eseguito dal thread numero: "+std::to_string(*workerId)<<std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-            void* res = testOdd(&val);//qui devo chiamare una void non deve restituirmi valore
+            //void* res = testOdd(&val);
+            //long* res = new long(isPrime((size_t)val));//TODO non so se ha senso castare qua
+            long* res = new long(isPrime((size_t)val));//TODO non so se ha senso castare qua  e il new long mi pare una porcata.
+            ssize_t &r = (*((ssize_t*) res));
             auto end_time = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> act_service_time = (end_time - start_time);
             std::cout<<"il service time è: "<< act_service_time.count()<<std::endl;
@@ -132,7 +146,7 @@ public:
             //size_t st = (size_t)(act_service_time * 1000);
             size_t* st = new size_t(act_service_time.count() * 1000);//TODO cotinua ad essere orribile anche così
             serviceTime->safe_push(st);
-            outputQueue->safe_push(res);
+            outputQueue->safe_push(&r);
         }
     }
 
@@ -181,6 +195,8 @@ private:
     std::thread* thCollector;
     Safe_Queue* outputQueue;
     int* EOSCounter = new int(0);
+    int* eos = new int(-1);
+    std::vector<long*> out;
     int* actualWorker;//TODO dovrà esserci una lock qui dato che il numero potrà cambiare
 public:
     Collector(Safe_Queue* _outputQueue, int* _actualWorker){
@@ -189,14 +205,15 @@ public:
     }
 
     void main(){
-        while (true){
-            if(EOSCounter <= actualWorker){
-                void* output;
-                outputQueue->safe_pop(&output);
-                if(output == EOS){
-                    EOSCounter += 1;
-                }
-                std::cout<<"L'output è: "+std::to_string(*(int*)output);
+        void* output = 0;
+        //outputQueue->safe_pop(&output);
+        while (*EOSCounter < *actualWorker){
+            outputQueue->safe_pop(&output);
+            std::cout<<"L'output è: "<<(*(int*)output)<<std::endl;
+            if((*(int*)output) == *eos){
+                *EOSCounter += 1;
+            }else{
+                out.push_back((long*)output);
             }
         }
     }
@@ -265,6 +282,7 @@ public:
         int workerId = 0;
         int* EOSCounter = new int(0);
         Emitter emitter(maxWorker, initSequence, jobsRequest, vectorWorkerIdRequest);
+        Collector collector(outputSequence, actualWorker);
         for (int i = 0; i < *maxWorker; i+=1) {
             this->workerVector->at(workerId) = new Worker(workerId, jobsRequest->at(workerId), vectorWorkerIdRequest, outputSequence, serviceTime);
             workerId += 1;
@@ -277,6 +295,8 @@ public:
         for (int i = 0; i < *initWorker; ++i) {
             workerVector->at(i)->activate();
         }
+        collector.startCollector();
+
 
         void* actualTime = 0;
         int averageCounter = 0;
@@ -303,11 +323,12 @@ public:
             workerVector->at(j)->disactivateAndTerminate();
         }
 
+        emitter.joinEmitter();
         for (int i = 0; i < *maxWorker; ++i) {
             std::cout<<"STO FACENDO IL JOIN DEI WORKER"<<std::endl;
             workerVector->at(i)->joinWorker();
         }
-        emitter.joinEmitter();
+        collector.joinCollector();
     }
 
     void checkTime(){
@@ -318,7 +339,7 @@ public:
             std::cout<<"Expected service time "<<*expectedServiceTime<<" tempo medio "<<*averageTime<<" qui va disattivato un nuovo thread"<<std::endl;
             std::cout<<"sto disattivando il thread "<<*actualWorker<<std::endl;
             workerVector->at(*actualWorker)->disactivate();
-            if(*actualWorker > 0){
+            if(*actualWorker > 1){
                 *actualWorker -= 1;
                 std::cout<<"actual worker "<<*actualWorker<<std::endl;
             }
@@ -346,7 +367,7 @@ public:
 
 int main() {
     int* maxWorker= new int(5);
-    int* initWorker= new int(3);
+    int* initWorker= new int(2);//TODO controllare perchè con 1 ad una certa non va
     int* movingAverageParam = new int(3);
     size_t* expectedServiceTime = new size_t(1 * 1000);
     size_t* upperBoundServiceTime = new size_t(3*1000);
@@ -354,7 +375,7 @@ int main() {
     Safe_Queue* testSequence;
     testSequence = new Safe_Queue(10 + *maxWorker);
     for(int i = 0; i < 10; i++){
-        int* val = new int(rand() % 100 + 1);
+        int* val = new int(rand() % 10000 + 1);
         testSequence->safe_push(val);
     }
 
