@@ -25,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5483">
-              <caret line="369" column="83" selection-start-line="369" selection-start-column="83" selection-end-line="369" selection-end-column="83" />
+            <state relative-caret-position="668">
+              <caret line="57" column="23" selection-start-line="57" selection-start-column="23" selection-end-line="57" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -53,7 +53,6 @@
       <find>maxWorker</find>
       <find>vectorWorkerIdRequest</find>
       <find>attivato</find>
-      <find>initWorker</find>
       <find>std::cout</find>
       <find>active_worker</find>
       <find>vector</find>
@@ -61,6 +60,9 @@
       <find>testOdd</find>
       <find>eseguito</find>
       <find>isPrime</find>
+      <find>disattivo</find>
+      <find>initWorker</find>
+      <find>actualWorker</find>
     </findStrings>
     <replaceStrings>
       <replace>double</replace>
@@ -179,7 +181,9 @@
       <workItem from="1584732265677" duration="68000" />
       <workItem from="1584781821445" duration="9053000" />
       <workItem from="1584867507255" duration="19668000" />
-      <workItem from="1584950969179" duration="27933000" />
+      <workItem from="1584950969179" duration="31910000" />
+      <workItem from="1585145307035" duration="106000" />
+      <workItem from="1585149910443" duration="1543000" />
     </task>
     <task id="LOCAL-00001" summary="stick thread">
       <created>1551965750229</created>
@@ -199,12 +203,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="140264000" />
+    <option name="totallyTimeSpent" value="145890000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-216" y="-1080" width="1920" height="1080" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14217253" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1086262" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -216,7 +221,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.20396039" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.16732673" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -241,106 +246,46 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/buffers/buffer.h">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/buffers/safe_queue.cpp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/buffersDouble/free_circular_buffer.h" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/free_circular_buffer.cpp" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/free_buffer.h" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/lock_buffer.h" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/safe_double_queue.cpp" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/safe_double_queue.h" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/lock_buffer.cpp" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/free_buffer.cpp" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/circular_buffer.cpp" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/buffer.h" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/buffer.cpp" />
+    <entry file="file://$PROJECT_DIR$/buffersDouble/circular_buffer.h" />
     <entry file="file://$PROJECT_DIR$/buffers/safe_queue.h">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/buffers/lock_buffer.cpp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/buffers/lock_buffer.h">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/free_circular_buffer.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="34" selection-start-line="4" selection-start-column="34" selection-end-line="4" selection-end-column="34" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/buffers/buffer.h">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/free_circular_buffer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="565">
-          <caret line="41" column="93" selection-start-line="41" selection-start-column="93" selection-end-line="41" selection-end-column="93" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/buffers/free_buffer.cpp">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/free_buffer.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="24" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="24" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/buffers/free_buffer.h">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/lock_buffer.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" selection-start-line="14" selection-end-line="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/safe_double_queue.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" selection-start-line="30" selection-end-line="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/safe_double_queue.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="45" selection-start-line="3" selection-start-column="45" selection-end-line="3" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/lock_buffer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="66" selection-start-line="2" selection-start-column="66" selection-end-line="2" selection-end-column="66" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/free_buffer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/circular_buffer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1035">
-          <caret line="69" column="29" selection-start-line="69" selection-start-column="29" selection-end-line="69" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/buffer.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="8" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/buffer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="27" selection-start-line="8" selection-start-column="27" selection-end-line="8" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/buffersDouble/circular_buffer.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="31" selection-start-line="11" selection-start-column="31" selection-end-line="11" selection-end-column="31" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/buffers/.goutputstream-1J3T6Z">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5483">
-          <caret line="369" column="83" selection-start-line="369" selection-start-column="83" selection-end-line="369" selection-end-column="83" />
+        <state relative-caret-position="668">
+          <caret line="57" column="23" selection-start-line="57" selection-start-column="23" selection-end-line="57" selection-end-column="23" />
         </state>
       </provider>
     </entry>

@@ -13,15 +13,17 @@ private:
     int* maxWorker;
     std::thread* thEmitter;
     Safe_Queue* inputSequence; //sequenza di interi, sarebbe lo stream iniziale
+    Safe_Queue* emitterTime;
     std::vector<int*>* vectorWorkerIdRequest;//unidiretional from worker to emitter. Vettore con tutte le richieste fatte dai worker
     std::vector<Safe_Queue*>* jobsRequest; //unidiretional from emitter to worker. Assegnazione dei jobs ai worker
     int* defaultWorkerVector = new int(-2);
 public:
-    Emitter(int* _maxWorker, Safe_Queue* _inputSequence, std::vector<Safe_Queue*>* _jobsRequest, std::vector<int*>* _vectorWorkerIdRequest) {
+    Emitter(int* _maxWorker, Safe_Queue* _inputSequence, std::vector<Safe_Queue*>* _jobsRequest, std::vector<int*>* _vectorWorkerIdRequest, Safe_Queue* _emitterTime) {
         maxWorker = _maxWorker;
         inputSequence = _inputSequence;
         jobsRequest = _jobsRequest;
         vectorWorkerIdRequest = _vectorWorkerIdRequest;
+        emitterTime = _emitterTime;
     }
 
     void nextItem(){
@@ -30,6 +32,7 @@ public:
         int workerRequest;
         inputSequence->safe_pop(&next);
         while(*(int*)next != *eos){
+            auto start_time = std::chrono::high_resolution_clock::now();
 
             //Invece che utilizzare una safequeue ho utilizzato un vettore. Il while scorre finchè non trova un valore diverso da -2
             while(*vectorWorkerIdRequest->at(counter) == -2){
@@ -47,6 +50,12 @@ public:
             counter +=1;
             if(counter == ((int)*maxWorker)) counter = 0;
             inputSequence->safe_pop(&next);
+
+
+            auto end_time = std::chrono::high_resolution_clock::now();
+            size_t act_service_time_worker = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+            size_t* stw = new size_t(act_service_time_worker);//TODO cotinua ad essere orribile anche così
+            emitterTime->safe_push(stw);
         }
         for(int i = 0; i < jobsRequest->size(); i++) {
             this->jobsRequest->at(i)->safe_push(eos);
@@ -135,16 +144,12 @@ public:
             }
             std::cout<<"questo calcolo viene eseguito dal thread numero: "+std::to_string(*workerId)<<std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-            //void* res = testOdd(&val);
-            //long* res = new long(isPrime((size_t)val));//TODO non so se ha senso castare qua
             long* res = new long(isPrime((size_t)val));//TODO non so se ha senso castare qua  e il new long mi pare una porcata.
             ssize_t &r = (*((ssize_t*) res));
             auto end_time = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> act_service_time = (end_time - start_time);
-            std::cout<<"il service time è: "<< act_service_time.count()<<std::endl;
-            //double* st = new double(act_service_time.count());//TODO orribile
-            //size_t st = (size_t)(act_service_time * 1000);
-            size_t* st = new size_t(act_service_time.count() * 1000);//TODO cotinua ad essere orribile anche così
+            size_t act_service_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+            std::cout<<"il service time è: "<< act_service_time<<std::endl;
+            size_t* st = new size_t(act_service_time);//TODO cotinua ad essere orribile anche così
             serviceTime->safe_push(st);
             outputQueue->safe_push(&r);
         }
@@ -197,17 +202,20 @@ private:
     int* EOSCounter = new int(0);
     int* eos = new int(-1);
     std::vector<long*> out;
+    std::mutex* actual_worker_mutex;
     int* actualWorker;//TODO dovrà esserci una lock qui dato che il numero potrà cambiare
 public:
-    Collector(Safe_Queue* _outputQueue, int* _actualWorker){
+    Collector(Safe_Queue* _outputQueue, int* _actualWorker, std::mutex* _actualWorkerMutex){
         outputQueue = _outputQueue;
         actualWorker = _actualWorker;
+        actual_worker_mutex = _actualWorkerMutex;
     }
 
     void main(){
         void* output = 0;
         //outputQueue->safe_pop(&output);
-        while (*EOSCounter < *actualWorker){
+        //while (*EOSCounter < *actualWorker){
+        while (*EOSCounter < getActualWorker()){
             outputQueue->safe_pop(&output);
             std::cout<<"L'output è: "<<(*(int*)output)<<std::endl;
             if((*(int*)output) == *eos){
@@ -216,6 +224,13 @@ public:
                 out.push_back((long*)output);
             }
         }
+    }
+
+    int getActualWorker(){//TODO mi pare una brutta cosa reimplementare la stessa cosa anche qui, sarebbe stato meglio fare un qualcosa di condiviso
+        actual_worker_mutex->lock();
+        int acWork = *actualWorker;
+        actual_worker_mutex->unlock();
+        return acWork;
     }
 
     void startCollector() {
@@ -239,13 +254,12 @@ private:
     size_t* upperBoundServiceTime;
     Safe_Queue* initSequence; //sequenza di void mandata dall'utente
     Safe_Queue* outputSequence;//TODO per ora è una safequeue, poi diventerà un vettore con le lock per ridurre overhead????????
-    //Safe_Queue* serviceTime;
 
-    //Safe_Double_Queue* serviceTime;
-    Safe_Queue* serviceTime;
-    //std::list<double>* serviceTime;
-    //std::mutex* serviceTime_mutex;
-    //std::condition_variable* serviceTime_condition;
+    Safe_Queue* serviceTime;//dei worker
+    Safe_Queue* emitterTime;
+
+    std::mutex* actual_worker_mutex;
+    //std::condition_variable* actual_worker_condition;
 
     std::vector<Safe_Queue*>* jobsRequest = new std::vector<Safe_Queue*>();
     std::vector<Worker*>* workerVector = new std::vector<Worker*>();
@@ -261,15 +275,16 @@ public:
         expectedServiceTime = _expectedTS;
         upperBoundServiceTime = _upperTS;
 
-        //serviceTime_mutex = new std::mutex();
-        //serviceTime_condition = new std::condition_variable();
+        actual_worker_mutex = new std::mutex();
+        //actual_worker_condition = new std::condition_variable();
 
         this->jobsRequest->resize(*maxWorker);
         this->vectorWorkerIdRequest->resize(*_maxWorker, new int(-2));
         this->workerVector->resize(*_maxWorker);
         this->outputSequence = new Safe_Queue(_queue->safe_get_size());
         //this->serviceTime = new Safe_Double_Queue(2*(*_movingAverageParam));
-        this->serviceTime = new Safe_Queue(2*(*_movingAverageParam));
+        this->serviceTime = new Safe_Queue(2*(*_movingAverageParam));//TODO ricontrollare se va bene come dimensione per il dane, come logica torna
+        this->emitterTime = new Safe_Queue(2*(*_movingAverageParam));//TODO uguale a sopra
         for (int i = 0; i < *_maxWorker; ++i) {
             Safe_Queue* q = new Safe_Queue(1);
             jobsRequest->at(i) = q;
@@ -281,10 +296,10 @@ public:
     void start(){
         int workerId = 0;
         int* EOSCounter = new int(0);
-        Emitter emitter(maxWorker, initSequence, jobsRequest, vectorWorkerIdRequest);
-        Collector collector(outputSequence, actualWorker);
+        Emitter emitter(maxWorker, initSequence, jobsRequest, vectorWorkerIdRequest, emitterTime);
+        Collector collector(outputSequence, actualWorker, actual_worker_mutex);
         for (int i = 0; i < *maxWorker; i+=1) {
-            this->workerVector->at(workerId) = new Worker(workerId, jobsRequest->at(workerId), vectorWorkerIdRequest, outputSequence, serviceTime);
+            this->workerVector->at(workerId) = new Worker(workerId, jobsRequest->at(workerId), vectorWorkerIdRequest, outputSequence, serviceTime);//TODO orribile passargli il valore e poi creare un nuovo puntatore con valore quello passato, però non trovavo una soluzione migliore. (se passo indirizzo è un casino)
             workerId += 1;
         }
 
@@ -299,6 +314,7 @@ public:
 
 
         void* actualTime = 0;
+        void* actualEmitterTime = 0;
         int averageCounter = 0;
         serviceTime->safe_pop(&actualTime);
         while (*EOSCounter < (*actualWorker)-1){
@@ -308,7 +324,8 @@ public:
             }else{
                 if(averageCounter < *movingAverageParam) {
                     serviceTime->safe_pop(&actualTime);
-                    *averageTime += *(size_t*)actualTime;
+                    emitterTime->safe_pop(&actualEmitterTime);
+                    *averageTime += *(size_t*)actualTime + *(size_t*)actualEmitterTime;
                     averageCounter += 1;
                 }else{
                     *averageTime = *averageTime / averageCounter;
@@ -329,6 +346,13 @@ public:
             workerVector->at(i)->joinWorker();
         }
         collector.joinCollector();
+    }
+
+    int getActualWorker(){
+        actual_worker_mutex->lock();
+        int acWork = *actualWorker;
+        actual_worker_mutex->unlock();
+        return acWork;
     }
 
     void checkTime(){
