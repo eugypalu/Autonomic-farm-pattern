@@ -22,4 +22,6 @@ class Safe_Queue : public Lock_Buffer{
 
 		size_t safe_get_size();
 
-};
+		size_t safe_empty();
+
+	};

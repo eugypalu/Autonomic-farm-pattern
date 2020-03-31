@@ -60,3 +60,8 @@ size_t Safe_Queue::safe_get_size(){
 	std::lock_guard<std::mutex> lock(*d_mutex);
 	return this->size;
 }
+
+size_t Safe_Queue::safe_empty(){
+    std::lock_guard<std::mutex> lock(*d_mutex);
+	return this->queue->empty();
+}
