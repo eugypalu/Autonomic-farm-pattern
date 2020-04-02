@@ -10,9 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="589d2b97-3c91-4052-8b8c-c3ebd1fc341a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/data/bl.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/buffers/safe_queue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/buffers/safe_queue.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/buffers/safe_queue.h" beforeDir="false" afterPath="$PROJECT_DIR$/buffers/safe_queue.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
@@ -22,32 +21,40 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="641">
-              <caret line="466" column="31" selection-start-line="466" selection-start-column="9" selection-end-line="466" selection-end-column="31" />
+            <state relative-caret-position="266">
+              <caret line="440" column="14" selection-start-line="440" selection-start-column="14" selection-end-line="440" selection-end-column="14" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/buffers/safe_queue.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="975">
-              <caret line="65" column="32" selection-start-line="65" selection-start-column="32" selection-end-line="65" selection-end-column="32" />
+        <entry file="file://$PROJECT_DIR$/data/bl.csv">
+          <provider selected="true" editor-type-id="csv-text-editor">
+            <state relative-caret-position="584">
+              <caret line="159" lean-forward="true" selection-start-line="159" selection-end-line="159" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/buffers/safe_queue.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
-            </state>
+          <provider editor-type-id="csv-table-editor">
+            <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
           </provider>
         </entry>
       </file>
@@ -55,36 +62,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>std::cout</find>
-      <find>vector</find>
-      <find>vector&lt;void*&gt;</find>
-      <find>testOdd</find>
-      <find>eseguito</find>
-      <find>isPrime</find>
-      <find>disattivo</find>
-      <find>initWorker</find>
-      <find>defau</find>
-      <find>defaultWorkerVector</find>
-      <find>checkTime</find>
-      <find>disattivo il worker</find>
-      <find>active_worker</find>
-      <find>actualWorker</find>
-      <find>vectorWorkerIdRequest</find>
-      <find>workerRequest</find>
-      <find>workerId</find>
-      <find>attivato</find>
-      <find>workerIdRequest</find>
-      <find>checkWorkerStatus</find>
-      <find>actual</find>
-      <find>Collector</find>
-      <find>actual_worker_mutex</find>
-      <find>getActualWorker</find>
-      <find>getWorkerTime</find>
-      <find>getActualTime</find>
-      <find>eos</find>
-      <find>dovrei</find>
-      <find>dovre</find>
       <find>notify</find>
+      <find>sma</find>
+      <find>get_avg_service_time_contexts</find>
+      <find>concurrency_throttling</find>
+      <find>activate</find>
+      <find>Tw</find>
+      <find>threads_scheduling_policy</find>
+      <find>emitterTime</find>
+      <find>std::atomic</find>
+      <find>isPrime</find>
+      <find>val</find>
+      <find>inputSequence</find>
+      <find>next</find>
+      <find>busy_wait</find>
+      <find>QUA</find>
+      <find>isP</find>
+      <find>Qui</find>
+      <find>maximum</find>
+      <find>cout</find>
+      <find>time</find>
+      <find>microseconds</find>
+      <find>getActualTime</find>
+      <find>actualWorker, farmTs, Time, Tw, Te,</find>
+      <find>microse</find>
+      <find>get_nw_moving_avg</find>
+      <find>actualTime</find>
+      <find>sleep</find>
+      <find>to_save</find>
+      <find>update_nw_moving_avg</find>
+      <find>lower</find>
     </findStrings>
     <replaceStrings>
       <replace>double</replace>
@@ -114,6 +121,7 @@
         <option value="$PROJECT_DIR$/buffersDouble/lock_buffer.cpp" />
         <option value="$PROJECT_DIR$/buffers/safe_queue.h" />
         <option value="$PROJECT_DIR$/buffers/safe_queue.cpp" />
+        <option value="$PROJECT_DIR$/data/bl.csv" />
         <option value="$PROJECT_DIR$/main.cpp" />
       </list>
     </option>
@@ -130,7 +138,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -141,12 +148,13 @@
             <path>
               <item name="spm" type="b2602c69:ProjectViewProjectNode" />
               <item name="spm" type="462c0819:PsiDirectoryNode" />
-              <item name="buffers" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -215,7 +223,9 @@
       <workItem from="1585395154083" duration="10552000" />
       <workItem from="1585469193559" duration="12615000" />
       <workItem from="1585555633548" duration="9673000" />
-      <workItem from="1585585500539" duration="3314000" />
+      <workItem from="1585585500539" duration="9243000" />
+      <workItem from="1585659153055" duration="6935000" />
+      <workItem from="1585673876638" duration="50882000" />
     </task>
     <task id="LOCAL-00001" summary="stick thread">
       <created>1551965750229</created>
@@ -235,13 +245,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="208752000" />
+    <option name="totallyTimeSpent" value="272498000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-216" y="-1080" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.118743345" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12832801" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -253,13 +263,13 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Terminal" order="9" weight="0.26646402" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" sideWeight="0.49893504" visible="true" weight="0.26646402" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50106496" side_tool="true" weight="0.26646402" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="make" order="4" />
+      <window_info anchor="right" id="Database" order="3" weight="0.32960597" />
+      <window_info anchor="right" id="make" order="4" weight="0.32960597" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -308,10 +318,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
+    <entry file="file://$PROJECT_DIR$/buffers/safe_queue.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="641">
-          <caret line="466" column="31" selection-start-line="466" selection-start-column="9" selection-end-line="466" selection-end-column="31" />
+        <state relative-caret-position="360">
+          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
         </state>
       </provider>
     </entry>
@@ -322,10 +332,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/buffers/safe_queue.h">
+    <entry file="file://$PROJECT_DIR$/data/bl.csv">
+      <provider editor-type-id="text-editor" />
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="584">
+          <caret line="159" lean-forward="true" selection-start-line="159" selection-end-line="159" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
+        <state relative-caret-position="266">
+          <caret line="440" column="14" selection-start-line="440" selection-start-column="14" selection-end-line="440" selection-end-column="14" />
         </state>
       </provider>
     </entry>
