@@ -10,8 +10,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="589d2b97-3c91-4052-8b8c-c3ebd1fc341a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data/bl.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Collector.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Controller.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Emitter.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Worker.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/bl.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/bl.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
@@ -37,11 +41,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="440" column="14" selection-start-line="440" selection-start-column="14" selection-end-line="440" selection-end-column="14" />
+            <state relative-caret-position="486">
+              <caret line="119" column="45" selection-start-line="119" selection-start-column="45" selection-end-line="119" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -49,12 +53,28 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/bl.csv">
           <provider selected="true" editor-type-id="csv-text-editor">
-            <state relative-caret-position="584">
-              <caret line="159" lean-forward="true" selection-start-line="159" selection-end-line="159" />
-            </state>
+            <state relative-caret-position="-115" />
           </provider>
           <provider editor-type-id="csv-table-editor">
             <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Controller.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="183">
+              <caret line="102" column="25" lean-forward="true" selection-start-line="102" selection-start-column="25" selection-end-line="102" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Worker.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="537">
+              <caret line="53" selection-start-line="53" selection-end-line="53" />
+            </state>
           </provider>
         </entry>
       </file>
@@ -62,36 +82,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>notify</find>
-      <find>sma</find>
-      <find>get_avg_service_time_contexts</find>
-      <find>concurrency_throttling</find>
-      <find>activate</find>
-      <find>Tw</find>
-      <find>threads_scheduling_policy</find>
-      <find>emitterTime</find>
-      <find>std::atomic</find>
-      <find>isPrime</find>
-      <find>val</find>
-      <find>inputSequence</find>
-      <find>next</find>
-      <find>busy_wait</find>
-      <find>QUA</find>
-      <find>isP</find>
-      <find>Qui</find>
-      <find>maximum</find>
-      <find>cout</find>
-      <find>time</find>
-      <find>microseconds</find>
-      <find>getActualTime</find>
-      <find>actualWorker, farmTs, Time, Tw, Te,</find>
-      <find>microse</find>
       <find>get_nw_moving_avg</find>
-      <find>actualTime</find>
       <find>sleep</find>
       <find>to_save</find>
       <find>update_nw_moving_avg</find>
       <find>lower</find>
+      <find>funct</find>
+      <find>dim</find>
+      <find>emitterTime</find>
+      <find>nw_series</find>
+      <find>workerIdRequest</find>
+      <find>serviceTime</find>
+      <find>defaultWorkerVector</find>
+      <find>stw</find>
+      <find>eos</find>
+      <find>res</find>
+      <find>out</find>
+      <find>act_service_time_worker</find>
+      <find>actualTime</find>
+      <find>collectorTime</find>
+      <find>EOSCounter</find>
+      <find>actualWorker</find>
+      <find>*actualWorker</find>
+      <find>getActualWorker</find>
+      <find>to</find>
+      <find>qui stampando actual</find>
+      <find>averageTime</find>
+      <find>initSequence</find>
+      <find>averageCounter</find>
+      <find>actualEmitterTime</find>
+      <find>EOS</find>
     </findStrings>
     <replaceStrings>
       <replace>double</replace>
@@ -122,7 +142,11 @@
         <option value="$PROJECT_DIR$/buffers/safe_queue.h" />
         <option value="$PROJECT_DIR$/buffers/safe_queue.cpp" />
         <option value="$PROJECT_DIR$/data/bl.csv" />
+        <option value="$PROJECT_DIR$/Worker.hpp" />
+        <option value="$PROJECT_DIR$/Collector.hpp" />
+        <option value="$PROJECT_DIR$/Emitter.hpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/Controller.hpp" />
       </list>
     </option>
   </component>
@@ -225,7 +249,8 @@
       <workItem from="1585555633548" duration="9673000" />
       <workItem from="1585585500539" duration="9243000" />
       <workItem from="1585659153055" duration="6935000" />
-      <workItem from="1585673876638" duration="50882000" />
+      <workItem from="1585673876638" duration="51113000" />
+      <workItem from="1585815759987" duration="22117000" />
     </task>
     <task id="LOCAL-00001" summary="stick thread">
       <created>1551965750229</created>
@@ -245,13 +270,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="272498000" />
+    <option name="totallyTimeSpent" value="294846000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-216" y="-1080" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12832801" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12939297" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -263,7 +288,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="9" sideWeight="0.49893504" visible="true" weight="0.26646402" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" sideWeight="0.49893504" visible="true" weight="0.32522798" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50106496" side_tool="true" weight="0.26646402" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -332,21 +357,53 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Collector.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="38" lean-forward="true" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Emitter.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="80" selection-start-line="23" selection-start-column="80" selection-end-line="23" selection-end-column="80" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Worker.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="537">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/data/bl.csv">
       <provider editor-type-id="text-editor" />
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
       </provider>
       <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="584">
-          <caret line="159" lean-forward="true" selection-start-line="159" selection-end-line="159" />
-        </state>
+        <state relative-caret-position="-115" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="440" column="14" selection-start-line="440" selection-start-column="14" selection-end-line="440" selection-end-column="14" />
+        <state relative-caret-position="486">
+          <caret line="119" column="45" selection-start-line="119" selection-start-column="45" selection-end-line="119" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Controller.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="102" column="25" lean-forward="true" selection-start-line="102" selection-start-column="25" selection-end-line="102" selection-end-column="42" />
         </state>
       </provider>
     </entry>
