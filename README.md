@@ -1,6 +1,6 @@
 # Autonomic farm pattern
 
-The goal is to provide a farm pattern ensuring (best effort) a given service time leveraging on dynamic variation of the parallelism degree. The farm is instantiated and run by providing:
+This repository contains a university project, the goal is to provide a farm pattern ensuring (best effort) a given service time leveraging on dynamic variation of the parallelism degree. The farm is instantiated and run by providing:
 
 * A collection of input tasks to be computed (of type Tin)
 * A function<Tout(Tin)> computing the single task
